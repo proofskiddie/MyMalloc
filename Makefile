@@ -4,11 +4,11 @@ CC = gcc -g
 all: git-commit MyMalloc.so test0 test1 test1-1 test1-2 test1-3 test1-4 test1 test2 test3 test4 test5 test6 test7
 
 MyMalloc.so: MyMalloc.c
-	$(CC) -fPIC -c -g MyMalloc.c -S
+	$(CC) -fPIC -c -g MyMalloc.c
 	gcc -shared -o MyMalloc.so MyMalloc.o
 
 test0: test0.c MyMalloc.c
-	$(CC) -o test0 test0.c MyMalloc.c
+	$(CC) -o test0 test0.c MyMalloc.c -S
 
 test1-1: test1-1.c MyMalloc.c
 	$(CC) -o test1-1 test1-1.c MyMalloc.c
