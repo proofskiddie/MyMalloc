@@ -125,7 +125,7 @@ void * allocateObject(size_t size)
 	int currSizeOffset = curr->_objectSize - roundedSize;
 	
 	//if block large enough to be split (enough for obj header plus 8 bytes)
-	if (curr->_allocated && currSizeOffset > 0) {
+	if (!curr->_allocated && currSizeOffset > 0) {
 		if (currSizeOffset > (objectHeaderSize + 7)) {
 			ObjectHeader *new = (ObjectHeader *)((char *)curr + roundedSize);
 			new->_objectSize = currSizeOffset - objectHeaderSize;
