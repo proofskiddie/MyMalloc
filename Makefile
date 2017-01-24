@@ -8,7 +8,7 @@ MyMalloc.so: MyMalloc.c
 	gcc -shared -o MyMalloc.so MyMalloc.o
 
 test0: test0.c MyMalloc.c
-	$(CC) -o test0 test0.c MyMalloc.c -S
+	$(CC) -o test0 test0.c MyMalloc.c
 
 test1-1: test1-1.c MyMalloc.c
 	$(CC) -o test1-1 test1-1.c MyMalloc.c

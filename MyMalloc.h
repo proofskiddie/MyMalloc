@@ -40,6 +40,8 @@ ObjectHeader _freeListSentinel;   // Sentinel of free list
 
 void initialize(); //Initializes the heap
 
+void establishFencePosts(char * _mem); // Establishes fenceposts for new 2MB block
+
 void * allocateObject(size_t size); // Allocates an object 
 
 void freeObject(void *ptr);         // Frees an object

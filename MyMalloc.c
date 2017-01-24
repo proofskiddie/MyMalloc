@@ -22,6 +22,7 @@
 static pthread_mutex_t mutex;
 
 const int arenaSize = 2097152;
+const int objectHeaderSize = sizeof(ObjectHeader); 
 
 void increaseMallocCalls()  { _mallocCalls++; }
 
@@ -55,24 +56,16 @@ void initialize()
 
     // In verbose mode register also printing statistics at exit
     atexit(atExitHandlerInC);
-
-    // establish fence posts
-    ObjectHeader * fencePostHead = (ObjectHeader *)_mem;
-    fencePostHead->_allocated = 1;
-    fencePostHead->_objectSize = 0;
-
-    char *temp = (char *)_mem + arenaSize - sizeof(ObjectHeader);
-    ObjectHeader * fencePostFoot = (ObjectHeader *)temp;
-    fencePostFoot->_allocated = 1;
-    fencePostFoot->_objectSize = 0;
-
+	
+    //Establish FencePosts
+    establishFencePosts(_mem);
     // Set up the sentinel as the start of the freeList
     _freeList = &_freeListSentinel;
 
     // Initialize the list to point to the _mem
-    temp = (char *)_mem + sizeof(ObjectHeader);
+    temp = (char *)_mem + objectHeaderSize;
     ObjectHeader *currentHeader = (ObjectHeader *)temp;
-    currentHeader->_objectSize = arenaSize - (2*sizeof(ObjectHeader)); // ~2MB
+    currentHeader->_objectSize = arenaSize - (2*objectHeaderSize); // ~2MB
     currentHeader->_leftObjectSize = 0;
     currentHeader->_allocated = 0;
     currentHeader->_listNext = _freeList;
@@ -84,6 +77,21 @@ void initialize()
     _memStart = (char *)currentHeader;
 
     _initialized = 1;
+}
+
+void establishFencePosts(char * _mem) {
+
+    ObjectHeader * fencePostHead = (ObjectHeader *)_mem;
+    fencePostHead->_allocated = 1;
+    fencePostHead->_objectSize = 0;
+    fencePostHead->_listNext = fencePostHead->_listPrev = NULL;
+
+    char *temp = (char *)_mem + arenaSize - objectHeaderSize;
+    ObjectHeader * fencePostFoot = (ObjectHeader *)temp;
+    fencePostFoot->_allocated = 1;
+    fencePostFoot->_objectSize = 0;
+    fencePostFoot->_listNext = fencePostFoot->_listPrev = NULL;
+
 }
 
 /* 
@@ -103,19 +111,64 @@ void * allocateObject(size_t size)
     /* Add the ObjectHeader to the size and round the total size up to a 
      * multiple of 8 bytes for alignment.
      */
-    size_t roundedSize = (size + sizeof(ObjectHeader) + 7) & ~7;
+    size_t roundedSize = (size + objectHeaderSize + 7) & ~7;
+    
+    //TEMP make sure request size if not too large
+    if (roundedSize >= arenaSize - 4*objectHeaderSize - 8) return NULL;
 
-    // Naively get memory from the OS every time
+
+    //find the first block large enough to roundedSize, returns if found
+    //else allocate a new block below loop
+    ObjectHeader *curr = _freeListSentinel;
+    for (; curr->listNext->_listNext = NULL; curr = curr->listNext) {
+	int currSizeOffset = curr->_objectSize - roundedSize;
+	
+	//if block large enough to be split (enough for obj header plus 8 bytes)
+	if (currSizeOffset > 0) {
+		if (currSizeOffset > (objectHeaderSize + 7)) {
+			ObjectHeader *new = (ObjectHeader *)((char *)curr + roundedSize);
+			new->_objectSize = currSizeOffset - objectHeaderSize;
+			new->_leftObjectSize = roundedSize;
+			new->_allocated = 0;
+			new->_listNext = curr->_listNext;
+			new->_listPrev = curr;
+			curr->_listNext = new;
+		}
+		curr->_allocated = 1;
+		return (void *)((char *)curr + objectHeaderSize);
+	}
+    }
+
+    //Allocate a new block of 2MB
     void *_mem = getMemoryFromOS(arenaSize); 
+    
+    // Establish fence posts
+    establishFencePosts(_mem);
 
-    // Store the size in the header
-    ObjectHeader *o = (ObjectHeader *)_mem;
+    // Create new headers
+    ObjectHeader *o = (ObjectHeader *)((char*)_mem + objectHeaderSize);
+    ObjectHeader *new = (ObjectHeader *)((char*)o + roundedSize);
+    
+    // set attrib for o
     o->_objectSize = roundedSize;
+    o->_leftObjectSize = curr->_objectSize;
+    o->_allocated = 1;
+    o->_listNext = new;
+    o->_listPrev = curr;
 
+    // set attrib for new
+    new->_objectSize = (arenaSize - 4*objectHeaderSize - roundedSize); 
+    new->_leftObjectSize = roundedSize;
+    new->_allocated = 0;
+    new->_listNext = curr->_listNext;
+    new->_listPrev = o;
+
+    curr->_listNext = o;
+    
     pthread_mutex_unlock(&mutex);
 
     // Return a pointer to useable memory
-    return (void *)((char *)o + sizeof(ObjectHeader));
+    return (void *)((char *)o + objectHeaderSize);
 }
 
 /* 
@@ -233,7 +286,7 @@ extern void * realloc(void *ptr, size_t size)
     if (ptr != 0) {
 
         // copy only the minimum number of bytes
-        ObjectHeader* hdr = (ObjectHeader *)((char *) ptr - sizeof(ObjectHeader));
+        ObjectHeader* hdr = (ObjectHeader *)((char *) ptr - objectHeaderSize);
         size_t sizeToCopy =  hdr->_objectSize;
         if (sizeToCopy > size)
             sizeToCopy = size;
