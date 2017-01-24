@@ -129,7 +129,7 @@ void * allocateObject(size_t size)
 		if (currSizeOffset > (objectHeaderSize + 7)) {
 			//create new header to split block and set attrib
 			ObjectHeader *new = (ObjectHeader *)((char *)curr + roundedSize);
-			new->_objectSize = currSizeOffset - objectHeaderSize;
+			new->_objectSize = currSizeOffset;
 			new->_leftObjectSize = roundedSize;
 			new->_allocated = 0;
 			new->_listNext = curr->_listNext;
