@@ -127,12 +127,16 @@ void * allocateObject(size_t size)
 	//if block large enough to be split (enough for obj header plus 8 bytes)
 	if (!curr->_allocated && currSizeOffset > 0) {
 		if (currSizeOffset > (objectHeaderSize + 7)) {
+			//create new header to split block and set attrib
 			ObjectHeader *new = (ObjectHeader *)((char *)curr + roundedSize);
 			new->_objectSize = currSizeOffset - objectHeaderSize;
 			new->_leftObjectSize = roundedSize;
 			new->_allocated = 0;
 			new->_listNext = curr->_listNext;
 			new->_listPrev = curr;
+
+			//update curr object size and next pointer
+			curr->_objectSize = roundedSize;
 			curr->_listNext = new;
 		}
 		curr->_allocated = 1;
@@ -163,7 +167,8 @@ void * allocateObject(size_t size)
     new->_allocated = 0;
     new->_listNext = curr->_listNext;
     new->_listPrev = o;
-
+    
+    // include o in freelist
     curr->_listNext = o;
     
     pthread_mutex_unlock(&mutex);
