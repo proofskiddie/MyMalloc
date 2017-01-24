@@ -63,7 +63,7 @@ void initialize()
     _freeList = &_freeListSentinel;
 
     // Initialize the list to point to the _mem
-    temp = (char *)_mem + objectHeaderSize;
+    char *temp = (char *)_mem + objectHeaderSize;
     ObjectHeader *currentHeader = (ObjectHeader *)temp;
     currentHeader->_objectSize = arenaSize - (2*objectHeaderSize); // ~2MB
     currentHeader->_leftObjectSize = 0;
