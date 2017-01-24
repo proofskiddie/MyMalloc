@@ -59,6 +59,7 @@ void initialize()
 	
     //Establish FencePosts
     establishFencePosts(_mem);
+
     // Set up the sentinel as the start of the freeList
     _freeList = &_freeListSentinel;
 
@@ -119,7 +120,7 @@ void * allocateObject(size_t size)
 
     //find the first block large enough to roundedSize, returns if found
     //else allocate a new block below loop
-    ObjectHeader *curr = _freeListSentinel._listNext;
+    ObjectHeader *curr = _freeList->_listNext;
     for (; curr->_listNext->_listNext = NULL; curr = curr->_listNext) {
 	int currSizeOffset = curr->_objectSize - roundedSize;
 	
