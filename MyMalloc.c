@@ -119,7 +119,7 @@ void * allocateObject(size_t size)
 
     //find the first block large enough to roundedSize, returns if found
     //else allocate a new block below loop
-    ObjectHeader *curr = _freeListSentinel;
+    ObjectHeader *curr = _freeListSentinel->listNext;
     for (; curr->listNext->_listNext = NULL; curr = curr->listNext) {
 	int currSizeOffset = curr->_objectSize - roundedSize;
 	
