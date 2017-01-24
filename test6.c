@@ -15,8 +15,9 @@ void *allocationThread(void *none){
 }
 
 int main(){
+
     printf("\n---- Running test6 ---\n");
-    int numThreads = 5;
+/*    int numThreads = 5;
     malloc(20);
 
     pthread_t threads[numThreads];
@@ -31,4 +32,5 @@ int main(){
 
     print_list();
     exit(0);
+*/
 }
