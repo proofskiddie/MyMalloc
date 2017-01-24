@@ -121,11 +121,11 @@ void * allocateObject(size_t size)
     //find the first block large enough to roundedSize, returns if found
     //else allocate a new block below loop
     ObjectHeader *curr = _freeList->_listNext;
-    for (; curr->_listNext->_listNext = NULL; curr = curr->_listNext) {
+    for (; curr != _freeList; curr = curr->_listNext) {
 	int currSizeOffset = curr->_objectSize - roundedSize;
 	
 	//if block large enough to be split (enough for obj header plus 8 bytes)
-	if (currSizeOffset > 0) {
+	if (curr->_allocated && currSizeOffset > 0) {
 		if (currSizeOffset > (objectHeaderSize + 7)) {
 			ObjectHeader *new = (ObjectHeader *)((char *)curr + roundedSize);
 			new->_objectSize = currSizeOffset - objectHeaderSize;
