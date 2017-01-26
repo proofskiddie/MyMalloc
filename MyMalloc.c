@@ -123,22 +123,26 @@ void * allocateObject(size_t size)
     ObjectHeader *curr = _freeList->_listNext;
     for (; curr != _freeList; curr = curr->_listNext) {
 	int currSizeOffset = curr->_objectSize - roundedSize;
-	
 	//if block large enough to be split (enough for obj header plus 8 bytes)
 	if (!curr->_allocated && currSizeOffset > 0) {
 		if (currSizeOffset > (objectHeaderSize + 7)) {
 			//create new header to split block and set attrib
-			ObjectHeader *new = (ObjectHeader *)((char *)curr + roundedSize);
-			new->_objectSize = currSizeOffset;
-			new->_leftObjectSize = roundedSize;
-			new->_allocated = 0;
-			new->_listNext = curr->_listNext;
-			new->_listPrev = curr;
+			ObjectHeader *new = (ObjectHeader *)((char *)curr + currSizeOffset); //highest memory is returned
+			new->_objectSize = roundedSize;
+			new->_leftObjectSize = currSizeOffset;
+			new->_allocated = 1;
+			new->_listNext = new->_listPrev = NULL;
 
 			//update curr object size and next pointer
-			curr->_objectSize = roundedSize;
-			curr->_listNext = new;
+			curr->_objectSize = currSizeOffset;
+			return (void *)((char *)new + objectHeaderSize);
 		}
+
+		//if block not large enough to split then
+		//remove curr from list and return it
+		curr->_listPrev->_listNext = curr->_listNext;
+		curr->_listNext->_listPrev = curr->_listPrev;
+		curr->_listNext = curr->listPrev = NULL;
 		curr->_allocated = 1;
 		return (void *)((char *)curr + objectHeaderSize);
 	}
