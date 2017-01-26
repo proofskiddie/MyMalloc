@@ -114,7 +114,7 @@ void * allocateObject(size_t size)
      */
     size_t roundedSize = (size + objectHeaderSize + 7) & ~7;
     
-    //TEMP make sure request size if not too large
+    //TEMP make sure request size is not too large
     if (roundedSize >= arenaSize - 4*objectHeaderSize - 8) return NULL;
 
 
@@ -186,7 +186,7 @@ void * allocateObject(size_t size)
  */
 void freeObject(void *ptr)
 {
-    // Add your implementation here
+    ((char *)ptr - sizeof(ObjectHeader))->_allocated = 0;
     return;
 }
 
