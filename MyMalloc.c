@@ -142,7 +142,7 @@ void * allocateObject(size_t size)
 		//remove curr from list and return it
 		curr->_listPrev->_listNext = curr->_listNext;
 		curr->_listNext->_listPrev = curr->_listPrev;
-		curr->_listNext = curr->listPrev = NULL;
+		curr->_listNext = curr->_listPrev = NULL;
 		curr->_allocated = 1;
 		return (void *)((char *)curr + objectHeaderSize);
 	}
