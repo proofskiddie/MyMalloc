@@ -209,11 +209,11 @@ void freeObject(void *ptr)
 	leftHeader->_listNext = rightHeader->_listNext;
 	rightHeader->_listNext->_listPrev = leftHeader;
 	rightHeader->_listNext->_leftObjectSize = newSize;
-    } else if (leftHeader->_allocated = 0) {
+    } else if (leftHeader->_allocated == 0) {
     	int newSize = leftHeader->_objectSize + ptrHeader->_objectSize;
 	leftHeader->_objectSize = newSize;
 	leftHeader->_listNext->_leftObjectSize = newSize; 
-    } else if (rightHeader->_allocated = 0) {
+    } else if (rightHeader->_allocated == 0) {
     	int newSize = rightHeader->_objectSize + ptrHeader->_objectSize;
 	ptrHeader->_objectSize = newSize;
 	ptrHeader->_listNext = rightHeader;
