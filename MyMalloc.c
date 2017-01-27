@@ -133,18 +133,19 @@ void * allocateObject(size_t size)
 			new->_allocated = 1;
 			new->_listNext = new->_listPrev = NULL;
 
-			//update curr object size and next pointer
+			//update curr object size
 			curr->_objectSize = currSizeOffset;
-			return (void *)((char *)new + objectHeaderSize);
-		}
 
-		//if block not large enough to split then
-		//remove curr from list and return it
-		curr->_listPrev->_listNext = curr->_listNext;
-		curr->_listNext->_listPrev = curr->_listPrev;
-		curr->_listNext = curr->_listPrev = NULL;
-		curr->_allocated = 1;
-		return (void *)((char *)curr + objectHeaderSize);
+			return (void *)((char *)new + objectHeaderSize);
+		} else {
+			//if block not large enough to split then
+			//remove curr from list and return it
+			curr->_listPrev->_listNext = curr->_listNext;
+			curr->_listNext->_listPrev = curr->_listPrev;
+			curr->_listNext = curr->_listPrev = NULL;
+			curr->_allocated = 1;
+			return (void *)((char *)curr + objectHeaderSize);
+		}
 	}
     }
 
