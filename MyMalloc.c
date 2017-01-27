@@ -238,6 +238,7 @@ void freeObject(void *ptr)
 	_freeList->_listNext = ptrHeader;
 	ptrHeader->_allocated = 0;
     }
+    pthread_mutex_unlock(&mutex);
     return;
 }
 
