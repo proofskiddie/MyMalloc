@@ -137,6 +137,7 @@ void * allocateObject(size_t size)
 			curr->_objectSize = currSizeOffset;
     			((ObjectHeader *)((char *)new + new->_objectSize))->_leftObjectSize = new->_objectSize;
 			
+        		pthread_mutex_unlock(&mutex);
 			return (void *)((char *)new + objectHeaderSize);
 		} else {
 			//if block not large enough to split then
@@ -145,6 +146,8 @@ void * allocateObject(size_t size)
 			curr->_listNext->_listPrev = curr->_listPrev;
 			curr->_listNext = curr->_listPrev = NULL;
 			curr->_allocated = 1;
+        		
+			pthread_mutex_unlock(&mutex);
 			return (void *)((char *)curr + objectHeaderSize);
 		}
 	}
