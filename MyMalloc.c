@@ -148,6 +148,9 @@ void * allocateObject(size_t size)
 		}
 	}
     }
+    
+    //Set curr to the last block
+    curr = _freeList->_listPrev;
 
     //Allocate a new block of 2MB
     void *_mem = getMemoryFromOS(arenaSize); 
