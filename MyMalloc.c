@@ -178,6 +178,9 @@ void * allocateObject(size_t size)
     // include o in freelist
     curr->_listNext = o;
     
+    // update _freeList back pointer
+    _freeList->_listPrev = o;
+    
     pthread_mutex_unlock(&mutex);
 
     // Return a pointer to useable memory
