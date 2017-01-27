@@ -135,8 +135,8 @@ void * allocateObject(size_t size)
 
 			//update curr object size
 			curr->_objectSize = currSizeOffset;
-			curr->_listNext->_leftObjectSize = roundedSize;
-
+    			((ObjectHeader *)((char *)new + new->_objectSize))->_leftObjectSize = new->_objectSize;
+			
 			return (void *)((char *)new + objectHeaderSize);
 		} else {
 			//if block not large enough to split then
