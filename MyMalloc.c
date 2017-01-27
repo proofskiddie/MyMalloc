@@ -129,12 +129,13 @@ void * allocateObject(size_t size)
 			//create new header to split block and set attrib
 			ObjectHeader *new = (ObjectHeader *)((char *)curr + currSizeOffset); //highest memory is returned
 			new->_objectSize = roundedSize;
-			new->_leftObjectSize = currSizeOffset;
+			new->_leftObjectSize = 0;
 			new->_allocated = 1;
 			new->_listNext = new->_listPrev = NULL;
 
 			//update curr object size
 			curr->_objectSize = currSizeOffset;
+			curr->_listNext->_leftObjectSize = currSizeOffset;
 
 			return (void *)((char *)new + objectHeaderSize);
 		} else {
@@ -149,9 +150,6 @@ void * allocateObject(size_t size)
 	}
     }
     
-    //Set curr to the last block
-    curr = _freeList->_listPrev;
-
     //Allocate a new block of 2MB
     void *_mem = getMemoryFromOS(arenaSize); 
     
@@ -164,10 +162,10 @@ void * allocateObject(size_t size)
     
     // set attrib for o
     o->_objectSize = (arenaSize - roundedSize - 2*objectHeaderSize);
-    o->_leftObjectSize = curr->_objectSize;
+    o->_leftObjectSize = 0;
     o->_allocated = 0;
-    o->_listNext = _freeList;
-    o->_listPrev = curr;
+    o->_listNext = _freeList->_listNext;
+    o->_listPrev = _freeList;
 
     // set attrib for new
     new->_objectSize = roundedSize;
@@ -176,10 +174,10 @@ void * allocateObject(size_t size)
     new->_listNext = new->_listPrev = 0;
     
     // include o in freelist
-    curr->_listNext = o;
+    _freeList->_listNext->_listPrev = o;
     
     // update _freeList back pointer
-    _freeList->_listPrev = o;
+    _freeList->_listNext = o;
     
     pthread_mutex_unlock(&mutex);
 
