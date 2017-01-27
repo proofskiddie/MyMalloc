@@ -202,24 +202,34 @@ void freeObject(void *ptr)
     //Note: can seperate checks as in the case both
     //are free then they will point to eachother
     if (leftHeader->_allocated == 0 && rightHeader->_allocated == 0) {
-    	int newSize =  ptrHeader->_objectSize + rightHeader->_objectSize;
+    	//update left header size
+	int newSize =  ptrHeader->_objectSize + rightHeader->_objectSize;
     	leftHeader->_objectSize += newSize;
+
+	//change pointers
 	leftHeader->_listNext = rightHeader->_listNext;
 	rightHeader->_listNext->_listPrev = leftHeader;
-	rightHeader->_listNext->_leftObjectSize = newSize;
+	
+	//update block to right of rightHeader _leftObjectSize
+    	((ObjectHeader *)((char *)rightHeader + rightHeader->_objectSize))->_leftObjectSize = newSize;
     } else if (leftHeader->_allocated == 0) {
+    	//update objectSize
     	int newSize = leftHeader->_objectSize + ptrHeader->_objectSize;
 	leftHeader->_objectSize = newSize;
-	leftHeader->_listNext->_leftObjectSize = newSize; 
+	
+	//update rightHeader _leftObjectSize
+    	rightHeader->_leftObjectSize = newSize;
     } else if (rightHeader->_allocated == 0) {
+    	//update objectSize
     	int newSize = rightHeader->_objectSize + ptrHeader->_objectSize;
 	ptrHeader->_objectSize = newSize;
-	ptrHeader->_listNext = rightHeader;
+	
+	//update pointers
+	ptrHeader->_listNext = rightHeader->_listNext;
 	ptrHeader->_listPrev = rightHeader->_listPrev;
-	ptrHeader->_leftObjectSize = rightHeader->_leftObjectSize;
-	rightHeader->_listPrev->_listNext = ptrHeader;
-	rightHeader->_listPrev = ptrHeader;
-	rightHeader->_listNext->_leftObjectSize = newSize;
+
+	//update block right of rightHeader _leftObjectSize
+	((ObjectHeader *)((char *)rightHeader + rightHeader->_objectSize))->_leftObjectSize = newSize;
 	ptrHeader->_allocated = 0;
     } else {
     	ptrHeader->_listNext = _freeList->_listNext;
