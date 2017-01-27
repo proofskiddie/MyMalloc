@@ -167,7 +167,7 @@ void * allocateObject(size_t size)
 
     // set attrib for new
     new->_objectSize = roundedSize;
-    new->_leftObjectSize = (arenaSize - roundedSize - 2*objectHeaderSizent);
+    new->_leftObjectSize = (arenaSize - roundedSize - 2*objectHeaderSize);
     new->_allocated = 1;
     new->_listNext = new->_listPrev = 0;
     
