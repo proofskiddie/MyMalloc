@@ -197,7 +197,18 @@ void freeObject(void *ptr)
     ObjectHeader *ptrHeader = (ObjectHeader *)((char *)ptr - objectHeaderSize);
     ObjectHeader *leftHeader = (ObjectHeader *)((char *)ptrHeader - ptrHeader->_leftObjectSize);
     ObjectHeader *rightHeader = (ObjectHeader *)((char *)ptrHeader +  ptrHeader->_objectSize);
-    
+    //DEBUGGING
+    //
+    //
+	printf("ptr %x\n", ptr);
+	printf("ptrHeader %x\n", ptrHeader);
+	printf("leftHeader %x\n", leftHeader);
+	printf("rightHeader %x\n", rightHeader);
+
+    //
+    //
+    //END DEBUGGING
+
     //Check if adj blocks are free else add ptr to the front of _freeList
     //Note: can seperate checks as in the case both
     //are free then they will point to eachother
@@ -258,6 +269,15 @@ void print_list() {
     ObjectHeader * ptr = _freeList->_listNext;
 
     while (ptr != _freeList) {
+    //DEBUGGING
+    //
+    //
+    //
+	printf("ptr %d %x\n", ptr);
+
+    //
+    //
+    //END DEBUGGING
         long offset = (long)ptr - (long)_memStart;
         printf("[offset:%ld,size:%zd]", offset, ptr->_objectSize);
         ptr = ptr->_listNext;
