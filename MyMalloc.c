@@ -196,7 +196,40 @@ void * allocateObject(size_t size)
  */
 void freeObject(void *ptr)
 {
-
+    ObjectHeader *ptrHeader = ((char *)ptr - objectHeaderSize);
+    ObjectHeader * leftHeader = ((char *)ptrHeader - ptrHeader->_leftObjectSize);
+    ObjectHeader * rightHeader = ((char *)ptrHeader +  ptrHeader->_objectSize);
+    
+    //Check if adj blocks are free else add ptr to the front of _freeList
+    //Note: can seperate checks as in the case both
+    //are free then they will point to eachother
+    if (leftHeader->_allocated = 0 && rightHeader->_allocated = 0) {
+    	int newSize =  ptrHeader->_objectSize + rightHeader->_objectSize;
+    	leftHeader->_objectSize += newSize;
+	leftHeader->_listNext = rightHeader->_listNext;
+	rightHeader->_listNext->_listPrev = leftHeader;
+	rightHeader->_listNext->_leftObjectSize = newSize;
+    } else if (leftHeader->_allocated = 0) {
+    	int newSize = leftHeader->_objectSize + ptrHeader->_objectSize;
+	leftHeader->_objectSize = newSize;
+	leftHeader->_listNext->_leftObjectSize = newSize; 
+    } else if (rightHeader->_allocated = 0) {
+    	int newSize = rightHeader->_objectSize + ptrHeader->_objectSize;
+	ptrHeader->_objectSize = newSize;
+	ptrHeader->_listNext = rightHeader;
+	ptrHeader->_listPrev = rightHeader->_listPrev;
+	ptrHeader->_leftObjectSize = rightHeader->_leftObjectSize;
+	rightHeader->_listPrev->_listNext = ptrHeader;
+	rightHeader->_listPrev = ptrHeader;
+	rightHeader->_listNext->_leftObjectSize = newSize;
+	ptrHeader->_allocated = 0;
+    } else {
+    	ptrHeader->_listNext = _freeList->_listNext;
+	ptrHeader->_listPrev = _freeList;
+	_freeList->_listNext->_listPrev = ptrHeader;
+	_freeList->_listNext = ptrHeader;
+	ptrHeader->_allocated = 0;
+    }
     return;
 }
 
