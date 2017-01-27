@@ -196,14 +196,14 @@ void * allocateObject(size_t size)
  */
 void freeObject(void *ptr)
 {
-    ObjectHeader *ptrHeader = ((char *)ptr - objectHeaderSize);
-    ObjectHeader * leftHeader = ((char *)ptrHeader - ptrHeader->_leftObjectSize);
-    ObjectHeader * rightHeader = ((char *)ptrHeader +  ptrHeader->_objectSize);
+    ObjectHeader *ptrHeader = (ObjectHeader *)((char *)ptr - objectHeaderSize);
+    ObjectHeader *leftHeader = (ObjectHeader *)((char *)ptrHeader - ptrHeader->_leftObjectSize);
+    ObjectHeader *rightHeader = (ObjectHeader *)((char *)ptrHeader +  ptrHeader->_objectSize);
     
     //Check if adj blocks are free else add ptr to the front of _freeList
     //Note: can seperate checks as in the case both
     //are free then they will point to eachother
-    if (leftHeader->_allocated = 0 && rightHeader->_allocated = 0) {
+    if (leftHeader->_allocated == 0 && rightHeader->_allocated == 0) {
     	int newSize =  ptrHeader->_objectSize + rightHeader->_objectSize;
     	leftHeader->_objectSize += newSize;
 	leftHeader->_listNext = rightHeader->_listNext;
