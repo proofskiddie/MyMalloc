@@ -201,9 +201,9 @@ void freeObject(void *ptr)
     //
     //
 	printf("ptr %x\n", ptr);
-	printf("ptrHeader %x\n", (int)ptrHeader);
-	printf("leftHeader %x\n", (int)leftHeader);
-	printf("rightHeader %x\n", (int)rightHeader);
+	printf("ptrHeader %x\n", (char)ptrHeader);
+	printf("leftHeader %x\n", (char)leftHeader);
+	printf("rightHeader %x\n", (char)rightHeader);
 
     //
     //
@@ -273,7 +273,7 @@ void print_list() {
     //
     //
     //
-	printf("ptr %d %x\n", (int)ptr);
+	printf("ptr %d %x\n", (char)ptr);
 
     //
     //
