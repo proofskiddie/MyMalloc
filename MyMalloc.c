@@ -155,13 +155,13 @@ void * allocateObject(size_t size)
     establishFencePosts(_mem);
 
     // Create new headers
-    ObjectHeader *o = (ObjectHeader *)((char*)_mem + objectHeaderSize);
+    ObjectHeader *o = (ObjectHeader *)((char*)_mem + objectHeaderSize); //skip dummy header
     ObjectHeader *new = (ObjectHeader *)((char*)_mem + arenaSize - roundedSize - objectHeaderSize);
     
     // set attrib for o
     o->_objectSize = (arenaSize - roundedSize - 2*objectHeaderSize);
     o->_leftObjectSize = curr->_objectSize;
-    o->_allocated = 1;
+    o->_allocated = 0;
     o->_listNext = _freeList;
     o->_listPrev = curr;
 
@@ -177,7 +177,7 @@ void * allocateObject(size_t size)
     pthread_mutex_unlock(&mutex);
 
     // Return a pointer to useable memory
-    return (void *)((char *)o + objectHeaderSize);
+    return (void *)((char *)new + objectHeaderSize);
 }
 
 /* 
