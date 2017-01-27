@@ -129,13 +129,13 @@ void * allocateObject(size_t size)
 			//create new header to split block and set attrib
 			ObjectHeader *new = (ObjectHeader *)((char *)curr + currSizeOffset); //highest memory is returned
 			new->_objectSize = roundedSize;
-			new->_leftObjectSize = 0;
+			new->_leftObjectSize = currSizeOffset;
 			new->_allocated = 1;
 			new->_listNext = new->_listPrev = NULL;
 
 			//update curr object size
 			curr->_objectSize = currSizeOffset;
-			curr->_listNext->_leftObjectSize = currSizeOffset;
+			curr->_listNext->_leftObjectSize = roundedSize;
 
 			return (void *)((char *)new + objectHeaderSize);
 		} else {
