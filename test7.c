@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include "MyMalloc.h"
 
-int allocations = 1;//10000;
+int allocations = 10000;
 
 int
 main( int argc, char **argv )
