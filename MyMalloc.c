@@ -196,7 +196,7 @@ void * allocateObject(size_t size)
  */
 void freeObject(void *ptr)
 {
-    ((ObjectHeader*)((char *)ptr - sizeof(ObjectHeader)))->_allocated = 0;
+
     return;
 }
 
