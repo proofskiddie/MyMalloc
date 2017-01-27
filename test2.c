@@ -16,8 +16,8 @@ main( int argc, char **argv )
     char * p1 = (char *) malloc(100 );
     *p1 = 100;
   }
-  //char * p2 = (char *) malloc(64);
   char * p3 = (char *) malloc(8);
+  char * p2 = (char *) malloc(64);
   print_list();
   //printf(">>>> test2 passed\n\n");
   exit( 0 );
