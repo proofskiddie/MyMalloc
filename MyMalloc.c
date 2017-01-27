@@ -273,7 +273,7 @@ void print_list() {
     //
     //
     //
-	printf("ptr %d %p\n", (void *)ptr);
+	printf("ptr %p\n", (void *)ptr);
 
     //
     //
