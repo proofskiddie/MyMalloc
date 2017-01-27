@@ -159,7 +159,7 @@ void * allocateObject(size_t size)
     ObjectHeader *new = (ObjectHeader *)((char*)o + arenaSize - roundedSize - objectHeaderSize);
     
     // set attrib for o
-    o->_objectSize = roundedSize;
+    o->_objectSize = (int)((char *)o - (char *)new);
     o->_leftObjectSize = curr->_objectSize;
     o->_allocated = 1;
     o->_listNext = _freeList;
