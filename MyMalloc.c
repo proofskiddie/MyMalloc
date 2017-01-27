@@ -156,7 +156,7 @@ void * allocateObject(size_t size)
 
     // Create new headers
     ObjectHeader *o = (ObjectHeader *)((char*)_mem + objectHeaderSize);
-    ObjectHeader *new = (ObjectHeader *)((char*)o + arenaSize - roundedsize - objectHeaderSize);
+    ObjectHeader *new = (ObjectHeader *)((char*)o + arenaSize - roundedSize - objectHeaderSize);
     
     // set attrib for o
     o->_objectSize = roundedSize;
