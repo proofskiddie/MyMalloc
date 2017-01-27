@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include "MyMalloc.h"
 
-int allocations = 15419;
+int allocations = 20000;
 
 int
 main( int argc, char **argv )
