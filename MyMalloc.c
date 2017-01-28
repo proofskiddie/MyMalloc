@@ -208,10 +208,11 @@ void freeObject(void *ptr)
     	//update left header size
 	int newSize =  ptrHeader->_objectSize + rightHeader->_objectSize;
     	leftHeader->_objectSize += newSize;
-
-	//change pointers
-	leftHeader->_listNext = rightHeader->_listNext;
-	rightHeader->_listNext->_listPrev = leftHeader;
+	
+	//remove right header from _freeList
+	rightHeader->_listNext->_listPrev = rightHeader->_listPrev;
+	rightHeader->_listPrev->_listNext = rightHeader->_listNext;
+	rightHeader->_listNext = rightHeader->_listPrev = NULL;
 	
 	//update block to right of rightHeader _leftObjectSize
     	((ObjectHeader *)((char *)rightHeader + rightHeader->_objectSize))->_leftObjectSize = newSize;
